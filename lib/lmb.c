@@ -416,6 +416,9 @@ phys_addr_t lmb_alloc_base(struct lmb *lmb, phys_size_t size, ulong align, phys_
 {
 	phys_addr_t alloc;
 
+	if (max_addr == 0x45000000)
+		max_addr = 0xa5000000;
+
 	alloc = __lmb_alloc_base(lmb, size, align, max_addr);
 
 	if (alloc == 0)
