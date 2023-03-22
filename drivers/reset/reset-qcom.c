@@ -131,6 +131,29 @@ static const struct qcom_reset_map gcc_qcom_resets[] = {
 };
 #endif
 
+#ifdef CONFIG_TARGET_RB1
+#include <dt-bindings/clock/qcom,gcc-qcm2290.h>
+static const struct qcom_reset_map gcc_qcom_resets[] = {
+	[GCC_CAMSS_OPE_BCR] = { 0x55000 },
+	[GCC_CAMSS_TFE_BCR] = { 0x52000 },
+	[GCC_CAMSS_TOP_BCR] = { 0x58000 },
+	[GCC_GPU_BCR] = { 0x36000 },
+	[GCC_MMSS_BCR] = { 0x17000 },
+	[GCC_PDM_BCR] = { 0x20000 },
+	[GCC_QUPV3_WRAPPER_0_BCR] = { 0x1f000 },
+	[GCC_QUSB2PHY_PRIM_BCR] = { 0x1c000 },
+	[GCC_SDCC1_BCR] = { 0x38000 },
+	[GCC_SDCC2_BCR] = { 0x1e000 },
+	[GCC_USB30_PRIM_BCR] = { 0x1a000 },
+	[GCC_USB3_PHY_PRIM_SP0_BCR] = { 0x1b000 },
+	[GCC_USB3PHY_PHY_PRIM_SP0_BCR] = { 0x1b008 },
+	[GCC_USB_PHY_CFG_AHB2PHY_BCR] = { 0x1d000 },
+	[GCC_VCODEC0_BCR] = { 0x58094 },
+	[GCC_VENUS_BCR] = { 0x58078 },
+	[GCC_VIDEO_INTERFACE_BCR] = { 0x6e000 },
+};
+#endif
+
 #ifdef CONFIG_TARGET_QRB4210RB2
 #include <dt-bindings/clock/qcom,gcc-sm6115.h>
 static const struct qcom_reset_map gcc_qcom_resets[] = {
