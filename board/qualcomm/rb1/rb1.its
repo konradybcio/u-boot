@@ -11,11 +11,11 @@
 	images {
 		kernel-uefi {
 			description = "Linux Kernel (EFI)";
-			data = /incbin/("./rb1_imgs/grubaa64.efi");
+			data = /incbin/("./rb1_imgs/Image.gz");
 			type = "kernel";
 			arch = "arm64";
 			os = "efi";
-			compression = "none";
+			compression = "gzip";
 			load = <0x90008000>;
 			entry = <0x90008000>;
 			hash-1 {
