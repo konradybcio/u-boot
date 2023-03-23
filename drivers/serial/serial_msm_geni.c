@@ -13,13 +13,13 @@
 #include <dm.h>
 #include <dm/pinctrl.h>
 #include <errno.h>
+#include <linux/bug.h>
 #include <linux/compiler.h>
-#include <log.h>
 #include <linux/delay.h>
+#include <log.h>
 #include <malloc.h>
 #include <serial.h>
 #include <watchdog.h>
-#include <linux/bug.h>
 
 #define UART_OVERSAMPLING	32
 #define STALE_TIMEOUT	160
@@ -132,12 +132,27 @@ DECLARE_GLOBAL_DATA_PTR;
 
 struct msm_serial_data {
 	phys_addr_t base;
+	u32 sampling_rate;
 	u32 baud;
 };
 
-unsigned long root_freq[] = {7372800,  14745600, 19200000, 29491200,
-					 32000000, 48000000, 64000000, 80000000,
-					 96000000, 100000000};
+static const unsigned long root_freq[] = {
+	7372800,
+	14745600,
+	19200000,
+	29491200,
+	32000000,
+	48000000,
+	64000000,
+	80000000,
+	96000000,
+	100000000,
+	102400000,
+	112000000,
+	117964800,
+	120000000,
+	128000000,
+};
 
 /**
  * get_clk_cfg() - Get clock rate to apply on clock supplier.
@@ -166,8 +181,7 @@ static int get_clk_cfg(unsigned long clk_freq)
  *
  * Return: frequency, supported by clock supplier, multiple of clk_freq.
  */
-static int get_clk_div_rate(u32 baud,
-							u64 sampling_rate, u32 *clk_div)
+static int get_clk_div_rate(u32 baud, u32 sampling_rate, u32 *clk_div)
 {
 	unsigned long ser_clk;
 	unsigned long desired_clk;
@@ -175,8 +189,8 @@ static int get_clk_div_rate(u32 baud,
 	desired_clk = baud * sampling_rate;
 	ser_clk = get_clk_cfg(desired_clk);
 	if (!ser_clk) {
-		pr_err("%s: Can't find matching DFS entry for baud %d\n",
-								__func__, baud);
+		pr_err("%s: Can't find matching DFS entry for baud=%u, s_rate=%u\n",
+		       __func__, baud, sampling_rate);
 		return ser_clk;
 	}
 
@@ -253,7 +267,7 @@ int msm_serial_setbrg(struct udevice *dev, int baud)
 	u32 clk_div;
 	u64 clk_rate;
 
-	clk_rate = get_clk_div_rate(baud, UART_OVERSAMPLING, &clk_div);
+	clk_rate = get_clk_div_rate(baud, priv->sampling_rate, &clk_div);
 	geni_serial_set_clock_rate(dev, clk_rate);
 	geni_serial_baud(priv->base, clk_div, baud);
 
@@ -549,6 +563,12 @@ static int msm_serial_ofdata_to_platdata(struct udevice *dev)
 	priv->base = dev_read_addr(dev);
 	if (priv->base == FDT_ADDR_T_NONE)
 		return -EINVAL;
+
+	priv->sampling_rate = UART_OVERSAMPLING;
+
+	/* Hack until we have a GENI QUP wrapper driver which maps parent's registers.. */
+	if (of_machine_is_compatible("qcom,qcm2290"))
+		priv->sampling_rate /= 2;
 
 	return 0;
 }
