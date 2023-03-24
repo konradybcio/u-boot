@@ -189,7 +189,7 @@ static int geni_serial_set_clock_rate(struct udevice *dev, u64 rate)
 	struct clk *clk;
 	int ret;
 
-	clk = devm_clk_get(dev, "se-clk");
+	clk = devm_clk_get(dev, "se");
 	if (!clk)
 		return -EINVAL;
 
@@ -554,7 +554,9 @@ static int msm_serial_ofdata_to_platdata(struct udevice *dev)
 }
 
 static const struct udevice_id msm_serial_ids[] = {
-	{.compatible = "qcom,msm-geni-uart"}, {}};
+	{ .compatible = "qcom,geni-debug-uart" },
+	{ }
+};
 
 U_BOOT_DRIVER(serial_msm_geni) = {
 	.name = "serial_msm_geni",
