@@ -164,3 +164,19 @@ int msm_enable(struct clk *clk)
 {
 	return 0;
 }
+
+static const struct udevice_id gcc_sm6115_of_match[] = {
+	{
+		.compatible = "qcom,gcc-sm6115",
+		/* TODO: add reset map */
+	},
+	{ }
+};
+
+U_BOOT_DRIVER(gcc_sm6115) = {
+	.name		= "gcc_sm6115",
+	.id		= UCLASS_NOP,
+	.of_match	= gcc_sm6115_of_match,
+	.bind		= qcom_cc_bind,
+	.flags		= DM_FLAG_PRE_RELOC,
+};
